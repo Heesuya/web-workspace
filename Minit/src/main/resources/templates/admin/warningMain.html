@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/user/userStyle.css" />
+<link rel="stylesheet" href="/css/font/font.css" />
+<head>
+<meta charset="UTF-8">
+<style>
+.admin>.btn-basic3{
+  background-color: #75daa4;
+  width: 120px;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  text-decoration: none;
+}
+</style>
+<title>관리자페이지</title>
+</head>
+<body>
+	<th:block th:include="common/header"></th:block>
+		<div class="wrapper">
+        <div class="findaccount-main">
+          <div class="logo">
+            <div class="logo-img">
+              <img src="/image/logo/minit_logo_2.png">
+            </div>
+          </div>
+          <div class="main">
+            <div class="main-text">
+              <div>
+                <span>관리할 기록장을 선택하세요</span>
+              </div>
+            </div>
+          </div>
+          <div class="link-button">
+            <div class="admin btn-basic">
+              <a href="/feed/selectReportFeed">개인기록장</a>
+            </div>
+            <div class="admin btn-basic">
+              <a href="/text/selectReportFeed">텍스트기록장</a>
+            </div>
+            <div class="admin btn-basic">            
+              <a href="/photo/selectReportFeed">사진기록장</a>
+            </div>
+          </div>
+          <div class="link-button">
+            <div class="admin btn-basic">            
+              <a href="/admin/allUser">전체회원정보</a>
+            </div>
+          </div>
+         </div>
+        </div>
+
+	<th:block th:include="common/footer"></th:block>
+</body>
+</html>

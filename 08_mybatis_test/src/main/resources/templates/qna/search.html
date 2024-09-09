@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>search</title>
+
+</head>
+
+<body>
+
+	<h1>조회 결과</h1>
+
+	<hr>
+
+	<table border="1">
+
+		<tr>
+
+			<th>번호</th>
+
+			<th>제목</th>
+
+			<th>내용</th>
+
+			<th>작성자</th>
+
+			<th>답변여부</th>
+
+		</tr>
+
+		<tr th:each="qna : ${qnaList}">
+
+			<td th:text="${qna.qnaNo}"></td>
+
+			<td th:text="${qna.qnaTitle}"></td>
+
+			<td th:text="${qna.qnaContent}"></td>
+
+			<td th:text="${qna.qnaWriter}"></td>
+
+			<td th:text="${qna.isAnswer}"></td>
+
+		</tr>
+
+	</table>
+
+</body>
+
+</html>

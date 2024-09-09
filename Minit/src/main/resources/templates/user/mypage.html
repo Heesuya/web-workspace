@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/user/userStyle.css"/>
+<link rel="stylesheet" href="/css/font/font.css" />
+<head>
+<meta charset="UTF-8">
+<title>마이페이지</title>
+
+</head>
+<body>
+	<th:block th:include="common/header"></th:block>
+	
+		<div class="wrapper">
+            <!--메인 컨텐츠 시작 -->
+            <section>
+                <div class="page-title">
+                    	마이 페이지
+                </div>
+                <div class="my-info-wrap">
+                    <form action="/user/update" method="post" autocomplete="off" enctype="multipart/form-data">
+                        <table class="info-tbl">
+                            <tr>
+                                <th>프로필 사진</th>
+                                <td width= 530px;>
+                                <input type="hidden" name="imgtype" id="imgtype" value="0">
+                                <div class="img-wrapper">
+                                  <div class="basic-img">
+                                  	<input type="hidden" name="userImg" th:value="${session.user.userImg}"/>
+	                                <img class="img-show" th:src="${'/user/'+session.user.userImg}">                               
+                                  </div>
+	                              <div id="img-viewer" class="img-none">
+	                                <img class="img-show" id="img-view">
+	                              </div>
+	                              <div class="logo-img img-none">
+	                                <img class="img-show logo" src="/user/minit_logo.png">                               
+                                  </div>
+                                </div>
+                                </td>
+                                <td>
+                                  <label for="upfile" class="wh-btn img-change-btn">변경
+                                	<input type="file" name="upfile" id="upfile" accept=".jpg,.png,.jpeg" onchange="loadImg(this);" style="display: none;">
+                                  </label>
+                                  <button type="button" class="wh-btn img-delete-btn">변경 취소</button>
+                                  <button type="button" class="wh-btn img-logo-btn">기본이미지</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>아이디</th>
+                                <td colspan="2" th:text="${session.user.userId}">아이디</td>
+                            </tr>
+                            <tr>
+                                <th>
+                                  <label for="userNick">사용자이름</label>
+                                </th>
+                                <td colspan="2">
+                                  <input type="hidden" id="sessionNick" th:value="${session.user.userNick}">
+                                  <div class="input-item">
+                                    <input type="text" name="userNick" id="userNick" th:value="${session.user.userNick}" class="required">
+	                                <p class="input-msg nick-check-msg none"></p>
+	                                <div class="input-msg nick-check-msg-invalid none">
+			                        	<span class="material-icons">info_outline</span>  
+			                        	<span>사용자이름은 한글, 영문, 숫자만 사용가능하며 1~10글자 이내로 작성해주세요</span>                      	
+			                        </div>
+			                        <div class="input-msg nick-check-msg-same none">
+			                        	<span class="material-icons">info_outline</span>
+			                        	<span>이미 사용중인 사용자이름입니다.</span>                      	
+			                        </div>
+			                        <div class="input-msg nick-check-msg-valid-same none">
+			                        	<span class="material-icons">check_circle_outline</span>
+			                        	<span>기존에 사용하던 사용자이름입니다.</span>                      	
+			                        </div>
+			                        <div class="input-msg nick-check-msg-valid none">
+			                        	<span class="material-icons">check_circle_outline</span>
+			                        	<span>사용가능한 사용자이름입니다.</span>                      	
+			                        </div>
+                                  </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                  <label for="userInfo">소개글</label>
+                                </th>
+                                <td colspan="2">
+                                  <div class="input-item">
+                                    <input type="text" name="userInfo" id="userInfo" th:value="${session.user.userInfo}" placeholder="소개글 입력란" style="width: 80%;">
+                                  </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>이름</th>
+                                <td colspan="2" th:text="${session.user.userName}">이름</td>
+                            </tr>
+                            <tr>
+                                <th>이메일</th>
+                                <td colspan="2" th:text="${session.user.userEmail}">이메일</td>
+                            </tr>
+                            <tr>
+                                <th>비밀번호</th>
+                                <td colspan="2">
+                                  <div class="input-item">
+                                    <input type="password" name="userPw" id="userPw" th:value="${session.user.userPw}" class="required">
+                                    <p class="input-msg pw-check-msg none"></p>
+                                    
+                                    <div class="input-msg pw-check-msg-invalid none">
+			                        	<span class="material-icons">info_outline</span>  
+			                        	<span>영문자or숫자or특수문자 중 2가지를 조합해 8~16글자 이내 작성해주세요.</span>                      	
+			                        </div>
+			                        <div class="input-msg pw-check-msg-valid none">
+			                        	<span class="material-icons">check_circle_outline</span>
+			                        	<span>유효한 비밀번호 입니다.</span>                      	
+			                        </div>
+                                  </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>비밀번호 확인</th>
+                                <td colspan="2">
+                                  <div class="input-item">
+                                    <input type="password" name="userRePw" id="userRePw">
+                                    <div class="input-msg repw-check-msg-invalid none">
+			                        	<span class="material-icons">info_outline</span>  
+			                        	<span>비밀번호가 일치하지 않습니다.</span>                      	
+			                        </div>
+			                        <div class="input-msg repw-check-msg-valid none">
+			                        	<span class="material-icons">check_circle_outline</span>
+			                        	<span>비밀번호가 일치합니다.</span>                      	
+			                        </div>
+			                        <div class="input-msg repw-check-msg-same none">
+			                        	<span class="material-icons">info_outline</span>
+			                        	<span>비밀번호를 수정하셨습니다. 다시 작성해주세요.</span>                      	
+			                        </div>
+                                  </div>
+                                </td>
+                            </tr>
+                            <tr>                                
+                              <th>가입일</th>
+                              <td colspan="2" th:text="${session.user.createDate}"></td>
+                            </tr>
+                            <tr>                                
+                              <th>최근 수정일</th>
+                              <td colspan="2" th:text="${session.user.updateDate}"></td>
+                            </tr>
+                            <tr>                                
+                              <th>누적 경고 횟수</th>
+                              <td colspan="2" th:text="${session.user.warningCount}"></td>
+                            </tr>
+                        </table>
+                        <div class="minit">
+							<span>* minit의 쾌적한 커뮤니티 환경을 위해 총 경고횟수가 5에 도달하면 탈퇴처리 됩니다.</span>
+						</div>
+                        <input type="hidden" name="userNo" th:value="${session.user.userNo}">
+                        <div class="mypage-btn">
+                          <button type="submit" class="btn-point2 update">정보수정</button>
+                          <button type="button" class="btn-point2 delBtn">회원탈퇴</button>
+                          <a th:if="${session.user.userLevel == 1}" href="/admin/warningMain" class="btn-point3">관리자 페이지로</a>
+                        </div>
+                    </form>
+                </div>
+                
+            </section>
+          </div>
+        
+		<script>
+		$(".delBtn").on("click",function(){
+			swal({
+				title : "탈퇴하시겠습니까?",
+				text : "탈퇴한 날로부터 30일이 지나야 재가입이 가능합니다.",
+				icon : "warning",
+				buttons : {
+					cancle : {
+						text : "취소",
+						value : false,
+						visible : true,
+						className : "",
+						closeModal : true
+					},
+					confirm : {
+						text : "탈퇴",
+						value : true,
+						visible : true,
+						className : "",
+						closeModal : true
+					}
+				}
+			}).then(function(isConfirm){
+				if(isConfirm){
+					location.href="/user/delete";					
+				}
+			});
+		});
+		
+
+		$(".img-logo-btn").on("click",function(){
+			$("#imgtype").val(1);
+			$(".logo-img").addClass("img-show").removeClass("img-none");
+			$(".basic-img").removeClass("img-show").addClass("img-none");
+			$("#img-viewer").removeClass("img-show").addClass("img-none");
+			$("#upfile").val(null); //이벤트의 주체가 이거니까! 제대로 확인
+		});
+		$(".img-delete-btn").on("click",function(){
+			$(".basic-img").addClass("img-show").removeClass("img-none");
+			$(".logo-img").removeClass("img-show").addClass("img-none");
+			$("#img-viewer").removeClass("img-show").addClass("img-none");
+			$("#upfile").val(null); //이벤트의 주체가 이거니까! 제대로 확인
+		});
+		
+			function loadImg(obj){
+				console.log(obj.files);
+				if(obj.files.length != 0 && obj.files[0] != 0){
+					const reader = new FileReader();
+					reader.readAsDataURL(obj.files[0]);
+					reader.onload = function(e){
+						$(".basic-img").removeClass("img-show").addClass("img-none");
+						$(".logo-img").removeClass("img-show").addClass("img-none");
+						$("#img-viewer").removeClass("img-none").addClass("img-show");
+						console.log(1);
+						$("#img-view").attr("src",e.target.result);
+					}
+					//console.log(2); //이게 먼저
+				}else{
+					$(".basic-img").addClass("img-show").removeClass("img-none");
+					$(".logo-img").removeClass("img-show").addClass("img-none");
+					$("#img-viewer").removeClass("img-show").addClass("img-none");
+					$("#img-view").attr("src","");
+				}
+			}
+		
+			$("#userNick").on("keyup",function(){
+				$("#userNick").removeClass("required");
+				//$(".nick-check-msg").removeClass("none").removeClass("valid").removeClass("invalid");
+				const userNick = $("#userNick").val();
+				const sessionNick = $("#sessionNick").val();
+				const nickReg = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣]{1,10}$/;
+				if(!nickReg.test(userNick)){
+					$(".nick-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+					$(".nick-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+					$(".nick-check-msg-same").addClass("none").removeClass("valid").removeClass("invalid");
+					$(".nick-check-msg-valid-same").addClass("none").removeClass("valid").removeClass("invalid");
+					$(".nick-check-msg-invalid").removeClass("none").addClass("invalid");
+				}else{
+					$.ajax({
+						url : "/user/ajaxCheckNick",
+						type : "get",
+						data : {userNick : userNick},
+						success : function(data){
+							if(data == 0){
+								$(".nick-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-same").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-valid-same").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-valid").removeClass("none").addClass("valid");
+								$("#userNick").addClass("required");
+								
+								$("#userNick").addClass("required");
+							}else if(userNick == sessionNick){
+								$(".nick-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-same").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-valid-same").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-valid-same").removeClass("none").addClass("valid");
+								$("#userNick").addClass("required");
+							}else{
+								$(".nick-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-same").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-valid-same").addClass("none").removeClass("valid").removeClass("invalid");
+								$(".nick-check-msg-same").removeClass("none").addClass("invalid");
+							}
+						},
+						error : function(){
+							console.log("에러 발생");
+						}
+					});
+				}
+			});
+			$("#userPw").on("keyup",function(){
+	    		$("#userPw").removeClass("required");
+	    		$("#userRePw").removeClass("required");
+	    		const userPw = $("#userPw").val();
+	    		const pwReg = /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&*()_+=]+)|(?:[0-9]+))$)[A-Za-z\d~!@#$%^&*()_+=]{8,16}$/;
+	    		if(!pwReg.test(userPw)){
+	    			$(".pw-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".pw-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".pw-check-msg-invalid").removeClass("none").addClass("invalid");
+	    			$(".repw-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".repw-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".repw-check-msg-same").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".repw-check-msg-same").removeClass("none").addClass("invalid");
+	    			$("#userRePw").removeClass("required");
+	    		}else{
+	    			$(".pw-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+					$(".pw-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+					$(".pw-check-msg-valid").removeClass("none").addClass("valid");
+					$("#userPw").addClass("required");
+					$(".repw-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".repw-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".repw-check-msg-same").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".repw-check-msg-same").removeClass("none").addClass("invalid");
+	    			$("#userRePw").removeClass("required");
+					const pwReValue = $("#userRePw").val();
+					if(userPw === pwReValue){
+						$(".repw-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+						$(".repw-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+						$(".repw-check-msg-valid").removeClass("none").addClass("valid");
+						$(".repw-check-msg-same").addClass("none").removeClass("valid").removeClass("invalid");
+						$("#userRePw").addClass("required");
+					}
+	    		}
+	    	})
+			$("#userRePw").on("keyup",function(){
+				$("#userRePw").removeClass("required");
+				//$(".repw-check-msg").removeClass("none");
+				const pwValue = $("#userPw").val();
+				const pwReValue = $("#userRePw").val();
+				if(pwValue === pwReValue){
+					$(".repw-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+					$(".repw-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+					$(".repw-check-msg-same").addClass("none").removeClass("valid").removeClass("invalid");
+					$(".repw-check-msg-valid").removeClass("none").addClass("valid");
+					$("#userRePw").addClass("required");
+				}else{
+					$(".repw-check-msg-invalid").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".repw-check-msg-valid").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".repw-check-msg-same").addClass("none").removeClass("valid").removeClass("invalid");
+	    			$(".repw-check-msg-invalid").removeClass("none").addClass("invalid");
+				}
+			});
+			
+			//잘못된 정보 있으면 안 넘어가게 
+	    	$(".update").on("click",function(){
+	    		const required = $(".required").length;
+	    		console.log(required);
+	    		if(required != 3){
+	    			swal({
+	    		        title: "입력값 확인 및 비밀번호 확인란 작성",
+	    		        text: "입력값을 확인하고 비밀번호 확인란까지 작성해주세요.",
+	    		        icon: "warning",
+	    		        closeOnClickOutside : false
+	    		      });		
+	    			event.preventDefault(); //이벤트 방지 submit 안 넘어가고
+	    		}else {
+	    			location.href = "/user/mypage";
+	    		}
+	    	});
+		</script>
+        
+        
+	<th:block th:include="common/footer"></th:block>
+</body>
+</html>

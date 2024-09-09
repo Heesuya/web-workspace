@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>게시글 작성</title>
+<style>
+	.board-write-container{
+		display : flex;
+		justify-content : center;
+		align-items: center;
+	}
+	.board-write-wrap{
+		width:1000px
+	}
+	.board-write-wrap .input-item>input[type=text]{
+		border-bottom : none;
+		padding : 0;
+	}
+	.board-write-wrap .input-item>textarea{
+		height: 300px;
+	}
+</style>
+</head>
+<body>
+	<th:block th:include="common/header"></th:block>
+		<main class="content board-wirte-container">
+			<section class="section board-write-wrap">
+				<div class="page-title">게시글 작성</div>
+				<form action="/board/write" method="post" enctype="multipart/form-data">
+					<table class="tbl">
+						<tr>
+							<th>제목</th>
+							<td colspan="3">
+								<div class="input-item">
+									<input type="text" name="boardTitle">
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th style="width:10%;">작성자</th>
+							<td style="width:40%;">
+								<span th:text="${session.member.memberId}"></span>
+								<input type="hidden" name="boardWriter" th:value="${session.member.memberId}">
+							</td>
+							<th style="width:10%;">첨부파일</th>
+							<td style="width:40%;">
+								<input type="file" name="upfile" multiple> <!-- mutiple은 여러개의 파일을 받을수 있다 -->
+							</td>
+						</tr>
+						<tr>
+							<td colspan="4">
+								<div class="input-item">
+									<textarea name="boardContent"></textarea>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="4">	
+								<button type="submit" class="btn-primary lg">게시글 작성</button>
+							</td>
+						</tr>
+					</table>					
+					</form>
+			</section>
+		</main>
+	<th:block th:include="common/footer"></th:block>
+</body>
+</html>

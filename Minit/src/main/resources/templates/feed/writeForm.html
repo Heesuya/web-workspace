@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>피드 작성</title>
+</head>
+<style>
+.image-container{
+	margin-top: 20px;
+	margin-bottom: 30px;
+
+}
+.input-item{
+	margin-bottom: 30px;
+
+}
+.tbl{
+	margin : 0 auto;
+}
+
+</style>
+<body>
+	<th:block th:include="common/header"></th:block>
+<script defer src="index.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="/css/feed/feedStyle.css" />
+<link rel="stylesheet" href="/css/feed/feedWriteForm.css" />
+<script src="/summernote/summernote-lite.js"></script>
+<script src="/summernote/lang/summernote-ko-KR.js"></script>
+<link rel="stylesheet" href="/summernote/summernote-lite.css">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+	crossorigin="anonymous" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+	integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+	crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+
+
+	<section>
+		<!--여기에 콘텐츠 작성-->
+		<div class="content">
+			<div class="page-title">
+				<p>새 게시물</p>
+			</div>
+			<form action="/feed/feedWrite" method="post" enctype="multipart/form-data">
+				 <div class="image-container">
+			        <div class="image-box">
+			            <input class="input-image-box" type="file" id="mainImageInput" accept=".jpg,.png,.jpeg" name="upfile1"> 
+			            <label for="mainImageInput" class="image-label"></label> 
+			            <img id="mainImage" src="/feed/image.png" alt="">
+			            <button type="button" class="delete-image" data-target="#mainImage">삭제</button>
+			            <!-- 파일번호  -->
+			        </div>
+			        <div class="image-box" id="topRightBox">
+			            <input class="input-image-box" type="file" id="topRightImageInput" accept=".jpg,.png,.jpeg" name="upfile2"> 
+			            <label for="topRightImageInput" class="image-label"></label> 
+			            <img id="topRightImage" src="/feed/image.png" alt="">
+			            <button type="button" class="delete-image" data-target="#topRightImage">삭제</button>
+			        </div>
+			        <div class="image-box" id="bottomRightBox">
+			            <input class="input-image-box" type="file" id="bottomRightImageInput" accept=".jpg,.png,.jpeg" name="upfile3"> 
+			            <label for="bottomRightImageInput" class="image-label"></label> 
+			            <img id="bottomRightImage" src="/feed/image.png" alt="">
+			            <button type="button" class="delete-image" data-target="#bottomRightImage">삭제</button>
+			        </div>
+			    </div>
+				<table class="tbl">
+					<td style="width: 40%;">
+						<!--히든으로 숨길예정--> 
+						<input type="hidden" name="userFeedWriter" th:value="${session.user.userId}">
+						<!--<input type="hidden" name="userFeedWriter" th:value="${session.user.userNo}">-->
+					</td>
+					</tr>
+					<tr>
+						<td colspan="4">
+							<div class="input-item">
+								<!-- 본문은 여러줄의 값을 입력하므로 input이 아닌 textarea로 입력 받음 -->
+								<textarea name="userFeedContent" id="userFeedContent"></textarea>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr class="button-tr">
+						<td colspan="4">
+							<button type="submit" class="button-style" onclick="return func()";>글 올리기</button>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		</div>
+	</section>s
+
+	<th:block th:include="common/footer"></th:block>
+	<script src="/js/feed/writeForm.js"></script>
+	<script src="/summernote/summernote-lite.js"></script>
+	<script src="/summernote/lang/summernote-ko-KR.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+		crossorigin="anonymous"></script>
+	<script>
+		function func(){
+				const mainImage = document.querySelector("#mainImage");
+	            const src1 = mainImage.getAttribute("src");
+				const topRightImage = document.querySelector("#topRightImage");
+	            const src2 = topRightImage.getAttribute("src");
+	            const bottomRightImage = document.querySelector("#bottomRightImage");
+	            const src3 = bottomRightImage.getAttribute("src");
+	            const text = document.querySelector("#userFeedContent");
+	            const textContent = text.value;
+				if(src1 === ''  && src2 === '' && src3 === ''){
+					alert("사진을 첨부해주세요.");
+					return false;
+				}
+	            if(textContent === ''){
+	                alert("글을 입력해주세요.");
+	                return false;
+	            }
+		}
+	
+		$('#userFeedContent').summernote(
+				{
+					// 에디터 높이
+					height : 500,
+					width : 850,
+					// 에디터 한글 설정
+					lang : "ko-KR",
+					// 에디터에 커서 이동 (input창의 autofocus라고 생각하시면 됩니다.)
+					focus : true,
+					toolbar : [
+							// 글꼴 설정
+							[ 'fontname', [ 'fontname' ] ],
+							// 글자 크기 설정
+							[ 'fontsize', [ 'fontsize' ] ],
+							// 굵기, 기울임꼴, 밑줄,취소 선, 서식지우기
+							[
+									'style',
+									[ 'bold', 'italic', 'underline',
+											'strikethrough', 'clear' ] ],
+							// 글자색
+							[ 'color', [ 'forecolor', 'color' ] ],
+							// 표만들기
+							[ 'table', [ 'table' ] ],
+							// 글머리 기호, 번호매기기, 문단정렬
+							[ 'para', [ 'ul', 'ol', 'paragraph' ] ],
+							// 줄간격
+							[ 'height', [ 'height' ] ],
+					// 그림첨부, 링크만들기, 동영상첨부
+					//['insert',['picture','link','video']],
+					// 코드보기, 확대해서보기, 도움말
+					//['view', ['codeview','fullscreen', 'help']]
+					],
+					// 추가한 글꼴
+					fontNames : [ 'Arial', 'Arial Black', 'Comic Sans MS',
+							'Courier New', '맑은 고딕', '궁서', '굴림체', '굴림', '돋음체',
+							'바탕체' ],
+					// 추가한 폰트사이즈
+					fontSizes : [ '8', '9', '10', '11', '12', '14', '16', '18',
+							'20', '22', '24', '28', '30', '36', '50', '72' ]
+				});
+		
+	</script>
+</body>
+</html>

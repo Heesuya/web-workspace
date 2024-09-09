@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>Thymeleaf each 테스트</h1>
+	<hr>
+	<th:block th:each="num : ${list1}"> <!-- for(int num : list -->
+		<h4 th:text="${num}"></h4>
+	</th:block>
+	<hr>
+	<h4 th:each="num : ${list1}" th:text="${num}"></h4>
+	<hr>
+	<th:block th:each="s : ${list2}">
+		<ul>
+  			<li th:text="${s.name}"></li>
+  			<li th:text="${s.age}"></li>
+  			<li th:text="${s.addr}"></li>
+		</ul>
+	</th:block>
+	<hr>
+	<ul th:each="s : ${list2}">
+  		<li th:text="${s.name}"></li>
+  		<li th:text="${s.age}"></li>
+  		<li th:text="${s.addr}"></li>
+	</ul>
+	
+	<hr><hr>
+	<ul th:each="s, status : ${list2}"> <!-- status = 정보가 모아져있다 -->
+		<li th:text="${s.name}"></li>
+		<li th:text="${status.index}"></li>
+		<li th:text="${status.count}"></li> <!-- 순서 (몇번째이다) -->
+		<li th:text="${status.size}"></li> <!-- 배열의 길이 -->
+		<li th:text="${status.even}"></li> <!-- index : 홀수 == true  -->
+		<li th:text="${status.odd}"></li> <!-- index : 짝수 == true  -->
+		<li th:text="${status.first}"></li> <!-- index : 첫번째 == true -->
+		<li th:text="${status.last}"></li> <!-- index : 마지막 == true  -->
+		<li th:text="${status.current}"></li> <!-- 이번회차의 객체  -->
+	</ul>
+	<hr>
+	<p th:each="num:${#numbers.sequence(1,5)}" th:text="${num}"></p>
+	<!-- 강제로 1~5까지시퀀스한 방법 -->
+</body>
+</html>

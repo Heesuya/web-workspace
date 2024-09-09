@@ -1,0 +1,26 @@
+package kr.co.iei.util;
+
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import kr.co.iei.member.model.dto.Member;
+
+public class AdminInterceptor implements HandlerInterceptor {
+
+	@Override //필요한것만 구현 하면 됨
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+		HttpSession session = request.getSession();
+		Member member = (Member)session.getAttribute("member");
+		if(member.getMemberLevel() == 1) {
+			return true;
+		}else {
+			response.sendRedirect("/member/adminMsg");
+			return false;
+		}
+	}
+	
+	
+}

@@ -1,0 +1,441 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 100vh;
+  padding-top: 60px; /* header 높이 만큼 추가 */
+  display: flex;
+  align-items: center;
+}
+
+.wrapper section {
+  flex: 1;
+  position: relative; /* section 요소를 상대적으로 배치 */
+  width: 100%;
+  max-width: 1100px;
+  overflow: auto;
+  margin-top: 5px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+header {
+  background-color: white;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000; /* header가 다른 요소들 위에 표시되도록 함 */
+}
+
+.navbar-expand-lg {
+  height: 65px;
+  border-bottom: 1px solid lightgrey;
+}
+
+.navbar-nav {
+  font-weight: bold;
+}
+
+/* 메인 콘텐츠 부분 */
+
+#columns {
+  column-width: 250px;
+  column-gap: 15px;
+}
+#columns figure {
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  margin: 0;
+  margin-bottom: 15px;
+  padding: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+#columns figure img {
+  width: 100%;
+}
+
+.article-container {
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  height: 100%;
+  overflow: auto;
+}
+
+.card {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
+  transition: transform 0.3s ease; /* 애니메이션 추가 */
+}
+
+.card img {
+  width: 80%;
+  height: 80%;
+  transition: transform 0.3s ease; /* 애니메이션 추가 */
+}
+
+.card:hover {
+  transform: scale(1.01); /* 이미지 확대 효과 */
+}
+
+.photoUpload {
+  margin-left: 50%;
+  margin-bottom: 130px;
+  display: flex;
+  justify-content: center;
+  position: sticky;
+  bottom: 15px; /* 아래 간격 15px 설정 */
+  width: 70px;
+  height: 110px;
+  z-index: 1500;
+}
+
+.nav{
+	width:100%;
+	height:100%;
+}
+
+.photoUpload .nav {
+  padding: 10px;
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  align-items: center;
+  background-color: #6ae088;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 섀도우 추가로 입체감 부여 */
+}
+
+.imageRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.imageIconBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  padding: 10px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  transform: translateX(0px); /* 오른쪽에서 나타나도록 설정 */
+}
+
+.imageIconBox.active {
+  opacity: 1;
+  transform: translateX(0); /* 원래 위치로 이동 */
+}
+
+.imageIconBox i {
+  font-size: 25px;
+  margin-right: 15px;
+}
+
+.imageToggle {
+  font-size: 30px;
+  margin-right: 30px;
+}
+
+.uploadItem {
+  font-size: 19px;
+  color: black;
+  text-decoration: none;
+}
+
+/* 메인 콘텐츠 끝 */
+footer {
+  background-color: white;
+  width: 100%;
+  font-size: 13px;
+  border-top: 1px solid lightgrey;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+}
+
+footer div {
+  margin-left: 30px;
+  margin-block-end: 30px;
+}
+
+.navbar .mx-auto {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 40px;
+}
+
+.btn-outline-success {
+  width: 80px;
+  height: 40px;
+}
+
+@media (max-width: 992px) {
+  .navbar .mx-auto {
+    position: static;
+    transform: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.container-fluid {
+  margin-top: 8px;
+}
+
+.nav-link {
+  border-bottom: 1px solid lightgrey;
+}
+
+/* 모달 댓글 부분 */
+
+.comment-section {
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.comment-input {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.comment-input input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.comments-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+}
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between; /* 수정 및 삭제 버튼을 오른쪽으로 정렬 */
+  margin-bottom: 10px;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.commenter-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.comment-actions {
+  display: flex;
+  align-items: center;
+}
+
+.comment-actions span {
+  margin-left: 10px;
+  cursor: pointer;
+  color: black;
+  text-decoration: none;
+}
+
+.comment-actions span:hover {
+  text-decoration: underline;
+}
+
+#updateModal {
+  z-index: 1060;
+}
+
+.image-modal-header {
+  display: flex;
+  flex-direction: row !important;
+}
+
+/* 오션 CSS*/
+
+.ocean {
+  background: #34bd72;
+  height: 10%;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+}
+.wave {
+  background: url("/wave.svg") repeat-x;
+  position: absolute;
+  top: -198px;
+  width: 6400px;
+  height: 198px;
+  animation: wave 7s cubic-bezier(0.39, 0.48, 0.66, 0.56) infinite;
+  transform: translate3d(0, 0, 0);
+}
+.wave:nth-of-type(2) {
+  top: -175px;
+  animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) -0.125s infinite,
+    swell 7s ease -1.25s infinite;
+  opacity: 1;
+}
+@keyframes wave {
+  0% {
+    margin-left: 0;
+  }
+  100% {
+    margin-left: -1600px;
+  }
+}
+@keyframes swell {
+  0%,
+  100% {
+    transform: translate3d(0, -25px, 0);
+  }
+  50% {
+    transform: translate3d(0, 5px, 0);
+  }
+}
+
+.ad-card {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+/* 반응형 설정 */
+@media (max-width: 1024px) {
+  .wrapper section, .article-container {
+    max-width: 90%;
+    width: 100%;
+  }
+
+  .card {
+    margin: 10px;
+    width: 90%;
+  }
+
+  .photoUpload {
+    width: 50px;
+    height: 80px;
+  }
+
+  .navbar .mx-auto {
+    width: 60%;
+  }
+}
+
+@media (max-width: 768px) {
+  #columns {
+    column-width: 100%;
+  }
+
+  .wrapper {
+    padding-top: 50px;
+  }
+
+  .card {
+    margin: 5px;
+    width: 100%;
+  }
+
+  .photoUpload {
+    width: 40px;
+    height: 60px;
+  }
+
+  .imageIconBox i {
+    font-size: 20px;
+    margin-right: 10px;
+  }
+
+  .imageToggle {
+    font-size: 25px;
+    margin-right: 20px;
+  }
+
+  .comment-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .navbar .mx-auto {
+    width: 80%;
+  }
+
+  .btn-outline-success {
+    width: 70px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 576px) {
+  .wrapper section {
+    padding-top: 40px;
+    max-width: 100%;
+  }
+
+  .photoUpload {
+    display: none;
+  }
+
+  .navbar .mx-auto {
+    width: 90%;
+  }
+
+  .card img {
+    width: 100%;
+    height: auto;
+  }
+
+  .imageToggle {
+    font-size: 20px;
+    margin-right: 15px;
+  }
+
+  .comment-avatar {
+    width: 25px;
+    height: 25px;
+  }
+
+  .btn-outline-success {
+    width: 60px;
+    height: 30px;
+  }
+}

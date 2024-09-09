@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/js/photo/index.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="/css/photo/photo.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+  <title>포토기록장</title>
+</head>
+<body>
+  <th:block th:include="common/header"></th:block>
+  <div class="wrapper">
+    <!-- 사진 업로드 모달 -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="uploadModalLabel">사진 업로드</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body">
+            <form action="/photo/write" method="post" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label for="fileInput" class="form-label">파일 선택</label>
+                <input class="form-control" type="file" id="fileInput" accept=".jpg,.png,.jpeg" name="imageFile" onchange="loadImg(this);" />
+              </div>
+              <div class="mb-3">
+                <input type="hidden" id="userId" name="userId" value="${session.user.id}"/>
+                <img id="previewImage" src="#" alt="미리보기" style="display: none; width: 100%;" />
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-outline-success">업로드</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 사진 수정 모달 -->
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateModalLabel">사진 수정</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body">
+            <form id="updateForm" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label for="updateImageInput" class="form-label">파일 선택</label>
+                <input class="form-control" type="file" id="updateImageInput" name="imageFile" accept=".jpg,.png,.jpeg" />
+              </div>
+              <div class="mb-3">
+                <img id="updatePreviewImage" src="#" alt="미리보기" style="display: none; width: 100%" />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-outline-success" id="saveUpdateBtn">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 이미지 모달 -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header image-modal-header">
+          <div id="contents-writer"></div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body">
+            <img id="modalImage" src="#" alt="이미지" style="width: 100%" />
+          </div>
+          
+          <div class="imageRow">
+          
+            <div class="imageIconBox"> 
+                 			
+              <i class="fa-regular fa-heart like-button" id="likeBtn"></i>
+              <i class="fa-solid fa-comment"></i>
+              <i class="fa-solid fa-bookmark bookmark-button" id="bookmarkBtn"></i>
+              <i class="fa-solid fa-pen edit-button" style="display:none;"></i>
+              <i class="fa-solid fa-trash delete-button" style="display:none;"></i>
+              <i class="fa-solid fa-exclamation"></i>
+            </div>
+            
+            <i class="fa-solid fa-ellipsis-vertical imageToggle"></i>
+          </div>
+          
+          <div class="comment-section" style="display: none">
+            <div class="comment-input">
+              <input type="text" class="form-control" id="commentInput" placeholder="댓글을 입력하세요"/>
+              <button type="submit" class="btn btn-outline-success" id="addCommentBtn">댓글</button>
+            </div>
+            <div class="comments-list">
+              <!-- 댓글 목록이 여기에 추가됩니다 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메인 콘텐츠 시작 -->
+    <section>
+      <span id="userIdClass" th:if="${session.user != null}" th:text="${session.user.userId}" style="display:none"></span>
+      <div id="columns" class="photoWrapper">
+        <!-- AJAX를 통해 동적으로 추가될 이미지들 -->
+      </div>
+    </section>
+    <div th:if="${session.user != null}" class="photoUpload">
+      <ul class="nav">
+        <li class="nav-item">
+          <a class="uploadItem" aria-current="page" href="#" data-bs-toggle="modal" data-bs-target="#uploadModal">+</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script th:inline="javascript">
+  
+  
+  
+  
+    $(document).ready(function() {
+    	$(document).ready(function () {
+            const photoUploadButton = $(".uploadItem"); // 업로드 버튼 요소
+            const bottomElement = document.querySelector("footer"); // 페이지 하단 요소 선택
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        // 스크롤이 맨 아래에 도달했을 때 아이콘을 위쪽 화살표로 변경
+                        photoUploadButton.html('<i class="fa-solid fa-up-long"></i>');
+                        // 모달 연동을 없애고 페이지 맨 위로 이동하는 기능만 남김
+                        photoUploadButton.removeAttr('data-bs-toggle');
+                        photoUploadButton.removeAttr('data-bs-target');
+                    } else {
+                        // 스크롤이 다시 위로 올라가면 아이콘을 플러스 모양으로 변경
+                        photoUploadButton.html('<i class="fa-solid fa-plus"></i>');
+                        // 모달 연동 기능 복구
+                        photoUploadButton.attr('data-bs-toggle', 'modal');
+                        photoUploadButton.attr('data-bs-target', '#uploadModal');
+                    }
+                });
+            });
+
+            observer.observe(bottomElement); // 하단 요소를 관찰
+
+            // 위쪽 화살표 아이콘을 클릭하면 페이지 맨 위로 스크롤
+            photoUploadButton.on("click", function () {
+                if ($(this).find("i").hasClass("fa-up-long")) {
+                    $("html, body").animate({ scrollTop: 0 }, "slow");
+                }
+            });
+        });
+    	
+    	
+    	
+    	
+    	
+    	
+  
+    	
+    	
+    	
+    	
+      $('#imageModal').on('hidden.bs.modal', function () {
+        // 모달을 비운 후 다시 로드
+        $("#modalImage").attr("src", ""); // 이미지 초기화
+        $(".comments-list").empty(); 
+        loadImages(); // 이미지 및 관련 데이터를 다시 로드
+      });
+
+      function loadImages() {
+        $.ajax({
+          url: "/photo/more",
+          type: "GET",
+          success: function(data) {
+            $("#columns").empty();
+            let adCounter = 0; // 광고 카운터 초기화
+
+            for (let i = 0; i < data.length; i++) {
+              const p = data[i];// 각 이미지의 userId 확인
+              const figure = $("<figure>").addClass("card").data("photoFeedNo", p.photoFeedNo).data("userId", p.photoFeedWriter);
+              const img = $("<img>").attr("src", "/photo/" + p.photoFeedImg).attr("alt", "Photo");
+              figure.append(img);
+              $("#columns").append(figure);
+
+              // 10개마다 광고 카드 추가
+              if ((i + 1) % 10 === 0) {
+                $.ajax({
+                  url: "/photo/adPlace",
+                  type: "GET",
+                  data: { pageNo: ++adCounter }, // 광고 페이지 번호를 증가시킴
+                  success: function(adData) {
+                    if (adData && adData.length > 0) {
+                      const ad = adData[0]; // 첫 번째 광고 데이터 사용
+                      const adFigure = $("<figure>").addClass("card ad-card");
+                      const adImg = $("<img>").attr("src", ad.mainImg).attr("alt", ad.mainTitle);
+                      const adTitle = $("<figcaption>").text(ad.mainTitle);
+                      adFigure.append(adImg).append(adTitle);
+                      $("#columns").append(adFigure);
+                    }
+                  }
+                });
+              }
+            }
+
+            setCardClickEvents(); // 카드 클릭 이벤트 설정
+          },
+          error: function(xhr, status, error) {
+            Swal.fire({
+              title: "로드 실패",
+              text: "이미지를 로드하는 중 오류가 발생했습니다.",
+              icon: "error"
+            });
+          }
+        });
+      }
+
+      function setCardClickEvents() {
+        $(".card").click(function(e) {
+          e.preventDefault();
+          const imgSrc = $(this).find("img").attr("src");
+          const photoFeedNo = $(this).data("photoFeedNo");
+          const userId = $(this).data("userId");
+          var sessionUserId = $("#userIdClass").text(); // 현재 로그인된 사용자 ID를 가져옴
+
+          $("#contents-writer").text(userId);
+          // 댓글 추가 이벤트 핸들러
+         $("#addCommentBtn").off("click").on("click", function() {
+    checkLoginStatus(function() {
+        const photoFeedCommentContent = $("#commentInput").val().trim();
+        if (photoFeedCommentContent) {
+            $.ajax({
+                url: "/photo/insertComment",
+                type: "POST",
+                data: { photoFeedNo: photoFeedNo, photoFeedCommentContent: photoFeedCommentContent }, // 여기에 commentText 포함
+                success: function(data) {
+                    if (data) {
+                        Swal.fire({
+                            title: "댓글 작성 완료",
+                            text: "댓글이 성공적으로 작성되었습니다.",
+                            icon: "success"
+                        });
+                        loadComments(photoFeedNo); // 새로 작성된 댓글을 다시 로드
+                        $("#commentInput").val(""); // 댓글 입력 필드 초기화
+                    } else {
+                        Swal.fire({
+                            title: "작성 실패",
+                            text: "댓글 작성에 실패했습니다. 다시 시도해주세요.",
+                            icon: "error"
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        title: "서버 전송 실패",
+                        text: "서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.",
+                        icon: "error"
+                    });
+                }
+            });
+        } else {
+            Swal.fire({
+                title: "댓글 내용 없음",
+                text: "댓글 내용을 입력해주세요.",
+                icon: "warning"
+            });
+        }
+    });
+});
+          
+          
+          
+          
+
+          $("#modalImage").attr("src", imgSrc);
+          $("#imageModal").modal("show");
+
+          // 작성자인 경우 수정 및 삭제 버튼 표시
+          if (sessionUserId === userId) {
+            $('.fa-pen').show();
+            $('.fa-trash').show();
+          } else {
+            $('.fa-pen').hide();
+            $('.fa-trash').hide();
+          }
+
+          // 좋아요 상태 가져오기
+          $.ajax({
+            url: "/photo/likeStatus",
+            type: "GET",
+            data: { photoFeedNo: photoFeedNo },
+            success: function(likeStatus) {
+              if (likeStatus === 1) {
+                $("#likeBtn").removeClass("fa-regular").addClass("fa-solid").data('liked', 1);
+              } else {
+                $("#likeBtn").removeClass("fa-solid").addClass("fa-regular").data('liked', 0);
+              }
+            },
+            error: function(xhr, status, error) {
+            }
+          });
+
+          // 좋아요 버튼 클릭 이벤트 핸들러
+          $("#likeBtn").off("click").on("click", function() {
+            checkLoginStatus(function() {
+              const isLike = $("#likeBtn").data('liked');
+              
+              
+              
+              
+              
+              $.ajax({
+                url: "/photo/likePush",
+                type: "post",
+                data: { photoFeedNo: photoFeedNo, isLike: isLike },
+                success: function(data) {
+                  if (data == -10) {
+                    Swal.fire({
+                      title: "로그인 필요",
+                      text: "로그인 후 이용해 주세요",
+                      icon: "info"
+                    });
+                  } else if(data == -1) {
+                    Swal.fire({
+                      title: "데이터 처리 오류",
+                      text: "문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
+                      icon: "warning"
+                    });
+                  } else {
+                    if(isLike === 1){
+                      $("#likeBtn").removeClass("fa-solid").addClass("fa-regular").data('liked', 0);
+                    } else {
+                      $("#likeBtn").removeClass("fa-regular").addClass("fa-solid").data('liked', 1);
+                    }
+                  }
+                },
+                error: function(xhr, status, error) {
+                  Swal.fire({
+                    title: "서버 전송 실패",
+                    text: "서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.",
+                    icon: "error"
+                  });
+                }
+              });
+            });
+          });
+
+          // 북마크 상태 가져오기
+          $.ajax({
+            url: "/photo/saveStatus",
+            type: "GET",
+            data: { photoFeedNo: photoFeedNo },
+            success: function(saveStatus) {
+              if (saveStatus === 1) {
+                $("#bookmarkBtn").removeClass("fa-regular").addClass("fa-solid").data('liked', 1);
+              } else {
+                $("#bookmarkBtn").removeClass("fa-solid").addClass("fa-regular").data('liked', 0);
+              }
+            },
+            error: function(xhr, status, error) {
+            }
+          });
+
+          // 북마크 버튼 클릭 이벤트 핸들러
+          $("#bookmarkBtn").off("click").on("click", function() {
+            checkLoginStatus(function() {
+              let isSave = $("#bookmarkBtn").data('liked');
+              if (typeof isSave === "undefined" || isSave === null) {
+                isSave = 0;
+              }
+
+              $.ajax({
+                url: "/photo/save",
+                type: "POST",
+                data: { 
+                  photoFeedNo: photoFeedNo, 
+                  isSave: isSave 
+                },
+                success: function(data) {
+                  if (data == -10) {
+                    Swal.fire({
+                      title: "로그인 필요",
+                      text: "로그인 후 이용해 주세요",
+                      icon: "info"
+                    });
+                  } else if (data == -1) {
+                    Swal.fire({
+                      title: "데이터 처리 오류",
+                      text: "문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
+                      icon: "warning"
+                    });
+                  } else {
+                    if (isSave === 1) {
+                      $("#bookmarkBtn").removeClass("fa-solid").addClass("fa-regular").data('liked', 0);
+                    } else {
+                      $("#bookmarkBtn").removeClass("fa-regular").addClass("fa-solid").data('liked', 1);
+                    }
+                  }
+                },
+                error: function(xhr, status, error) {
+                  Swal.fire({
+                    title: "서버 전송 실패",
+                    text: "서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.",
+                    icon: "error"
+                  });
+                }
+              });
+            });
+          });
+
+          // 삭제 버튼 클릭 이벤트 핸들러
+          $('.fa-trash').off('click').on('click', function() {
+            checkLoginStatus(function() {
+              del(this, photoFeedNo);
+              $("#imageModal").modal("hide");
+            });
+          });
+
+          // 수정 버튼 클릭 이벤트 핸들러
+          $('.fa-pen').off('click').on('click', function() {
+            checkLoginStatus(function() {
+              update(this, photoFeedNo);
+            });
+          });
+
+          // 댓글 아이콘 클릭 이벤트 추가
+          $('.fa-comment').off('click').on('click', function() {
+            checkLoginStatus(function() {
+              $('.comment-section').toggle();
+              loadComments(photoFeedNo);
+            });
+          });
+
+          // 신고 아이콘 클릭 이벤트 추가
+          $('.fa-exclamation').off('click').on('click', function() {
+            checkLoginStatus(function() {
+              Swal.fire({
+                title: "신고하시겠습니까?",
+                text: "이 이미지를 신고하시겠습니까?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "신고",
+                cancelButtonText: "취소"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  const isDec = 0;
+                  reportImage(photoFeedNo, isDec);
+                }
+              });
+            });
+          });
+        });
+      }
+
+      function reportImage(photoFeedNo, isDec) {
+        $.ajax({
+          url: "/photo/report",
+          type: "post",
+          data: { 
+            photoFeedNo: photoFeedNo,
+            isDec: isDec
+          },
+          success: function(data) {
+            if (data == 1) {
+              Swal.fire({
+                title: "신고 성공",
+                text: "성공적으로 신고되었습니다.",
+                icon: "success"
+              });
+            } else if(data == -100) {
+              Swal.fire({
+                title: "신고한 게시물입니다.",
+                text: "이미 신고한 게시물입니다.",
+                icon: "warning"
+              });
+            } else if(data == -1000) {
+              Swal.fire({
+                title: "신고되었습니다.",
+                text: "게시글이 삭제되었습니다.",
+                icon: "warning"
+              });
+            } else {
+              Swal.fire({
+                title: "신고 실패",
+                text: "이미지 신고에 실패했습니다. 다시 시도해주세요.",
+                icon: "error"
+              });
+            }
+          },
+          error: function(xhr, status, error) {
+            //console.log("신고 오류: " + error);
+            Swal.fire({
+              title: "서버 전송 실패",
+              text: "서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.",
+              icon: "error"
+            });
+          }
+        });
+      }
+
+      function del(element, photoFeedNo) {
+        $.ajax({
+          url: "/photo/delete",
+          type: "get",
+          data: { photoFeedNo: photoFeedNo },
+          dataType: "json",
+          success: function(result) {
+            if (result === 1) {
+              Swal.fire({
+                title: "삭제 성공",
+                text: "피드 삭제 성공",
+                icon: "success"
+              });
+              $(element).closest(".card").remove();
+            } else {
+              Swal.fire({
+                title: "삭제 실패",
+                text: "작성자가 아닙니다.",
+                icon: "warning"
+              });
+            }
+          },
+          error: function(xhr, status, error) {
+            //console.log("Error: " + error);
+            Swal.fire({
+              title: "서버 전송 실패",
+              text: "서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.",
+              icon: "error"
+            });
+          }
+        });
+      }
+
+      function update(element, photoFeedNo) {
+        $("#updateModal").modal("show");
+        $("#saveUpdateBtn").off("click").on("click", function() {
+          const formData = new FormData($("#updateForm")[0]);
+          formData.append("photoFeedNo", photoFeedNo);
+          $.ajax({
+            url: "/photo/update",
+            type: "post",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(result) {
+              if (result === 1) {
+                Swal.fire({
+                  title: "수정 성공",
+                  text: "피드 수정 성공",
+                  icon: "success"
+                });
+                $("#updateModal").modal("hide");
+                $("#imageModal").modal("hide");
+                loadImages();
+              } else {
+                Swal.fire({
+                  title: "수정 실패",
+                  text: "작성자가 아닙니다.",
+                  icon: "warning"
+                });
+              }
+            },
+            error: function(xhr, status, error) {
+              //console.log("Error: " + error);
+              Swal.fire({
+                title: "서버 전송 실패",
+                text: "서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.",
+                icon: "error"
+              });
+            }
+          });
+        });
+      }
+
+      function loadComments(photoFeedNo) {
+    	    $.ajax({
+    	        url: "/photo/comments",
+    	        type: "GET",
+    	        data: { photoFeedNo: photoFeedNo },
+    	        success: function(comments) {
+    	            const commentsList = $(".comments-list");
+    	            commentsList.empty();
+    	            if (comments.length > 0) {
+    	                comments.forEach(comment => {
+    	                    const commentItem = $("<div>").addClass("comment").data("commentId", comment.photoFeedCommentNo);
+    	                    commentItem.append($("<img>").attr("src", "/user/" + comment.photoFeedCommentWriterImg).attr("alt", "Avatar").addClass("comment-avatar"));
+    	                    const commentContent = $("<div>").addClass("comment-content");
+    	                    commentContent.append($("<p>").addClass("commenter-name").text(comment.photoFeedCommentWriter));
+    	                    const commentText = $("<p>").addClass("comment-text").text(comment.photoFeedCommentContent);
+    	                    commentContent.append(commentText);
+    	                    commentItem.append(commentContent);
+    	                    const commentActions = $("<div>").addClass("comment-actions");
+    	                    commentActions.append($("<span>").addClass("edit-comment").text("수정"));
+    	                    commentActions.append($("<span>").addClass("delete-comment").text("삭제"));
+    	                    commentItem.append(commentActions);
+    	                    commentsList.append(commentItem);
+
+    	                    // 수정 버튼 클릭 이벤트 핸들러
+    	                    commentActions.find(".edit-comment").on("click", function() {
+    	                        const commentTextElem = commentContent.find(".comment-text");
+    	                        const currentText = commentTextElem.text();
+    	                        const editInput = $("<input>").attr("type", "text").val(currentText).addClass("form-control");
+    	                        commentTextElem.replaceWith(editInput);
+    	                        $(this).text("저장").removeClass("edit-comment").addClass("save-comment");
+
+    	                        // 저장 버튼 클릭 이벤트 핸들러
+    	                        commentActions.find(".save-comment").on("click", function() {
+    	                            const photoFeedCommentContent = editInput.val();
+    	                            const photoFeedCommentNo = commentItem.data("commentId");
+
+    	                            $.ajax({
+    	                                url: "/photo/updateComment",
+    	                                type: "POST",
+    	                                data: { photoFeedCommentNo: photoFeedCommentNo, photoFeedCommentContent: photoFeedCommentContent },
+    	                                success: function(data) {
+    	                                    if (data) {
+    	                                        Swal.fire({
+    	                                            title: "수정 성공",
+    	                                            text: "댓글이 성공적으로 수정되었습니다.",
+    	                                            icon: "success"
+    	                                        });
+    	                                        editInput.replaceWith($("<p>").addClass("comment-text").text(photoFeedCommentContent));
+    	                                        commentActions.find(".save-comment").text("수정").removeClass("save-comment").addClass("edit-comment");
+    	                                    } else {
+    	                                        Swal.fire({
+    	                                            title: "수정 실패",
+    	                                            text: "댓글 수정에 실패했습니다. 다시 시도해주세요.",
+    	                                            icon: "error"
+    	                                        });
+    	                                    }
+    	                                },
+    	                                error: function(xhr, status, error) {
+    	                                    //console.log("댓글 수정 오류: " + error);
+    	                                    Swal.fire({
+    	                                        title: "서버 전송 실패",
+    	                                        text: "서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    	                                        icon: "error"
+    	                                    });
+    	                                }
+    	                            });
+    	                        });
+    	                    });
+
+    	                    // 삭제 버튼 클릭 이벤트 핸들러
+    	                    commentActions.find(".delete-comment").on("click", function() {
+    	                        const photoFeedCommentNo = commentItem.data("commentId");
+
+    	                        Swal.fire({
+    	                            title: "댓글 삭제",
+    	                            text: "댓글을 삭제하시겠습니까?",
+    	                            icon: "warning",
+    	                            showCancelButton: true,
+    	                            confirmButtonColor: "#3085d6",
+    	                            cancelButtonColor: "#d33",
+    	                            confirmButtonText: "삭제",
+    	                            cancelButtonText: "취소"
+    	                        }).then((result) => {
+    	                            if (result.isConfirmed) {
+    	                                $.ajax({
+    	                                    url: "/photo/deleteComment",
+    	                                    type: "GET",
+    	                                    data: { photoFeedCommentNo: photoFeedCommentNo },
+    	                                    success: function(data) {
+    	                                        if (data) {
+    	                                            Swal.fire({
+    	                                                title: "삭제 성공",
+    	                                                text: "댓글이 성공적으로 삭제되었습니다.",
+    	                                                icon: "success"
+    	                                            });
+    	                                            commentItem.remove(); // 댓글 삭제
+    	                                        } else {
+    	                                            Swal.fire({
+    	                                                title: "삭제 실패",
+    	                                                text: "댓글 삭제에 실패했습니다. 다시 시도해주세요.",
+    	                                                icon: "error"
+    	                                            });
+    	                                        }
+    	                                    },
+    	                                    error: function(xhr, status, error) {
+    	                                        //console.log("댓글 삭제 오류: " + error);
+    	                                        Swal.fire({
+    	                                            title: "서버 전송 실패",
+    	                                            text: "서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    	                                            icon: "error"
+    	                                        });
+    	                                    }
+    	                                });
+    	                            }
+    	                        });
+    	                    });
+    	                });
+    	            } else {
+    	                commentsList.append($("<div>").addClass("no-comments").text("댓글이 없습니다."));
+    	            }
+    	        },
+    	        error: function(xhr, status, error) {
+    	            //console.log("Error loading comments: " + error);
+    	            Swal.fire({
+    	                title: "댓글 로드 실패",
+    	                text: "댓글을 로드하는 중 오류가 발생했습니다.",
+    	                icon: "error"
+    	            });
+    	        }
+    	    });
+    	}
+
+      function checkLoginStatus(callback) {
+        $.ajax({
+          url: "/user/checkLoginStatus",
+          type: "GET",
+          success: function(isLoggedIn) {
+            if (isLoggedIn) {
+              callback();
+            } else {
+              Swal.fire({
+                title: "로그인 필요",
+                text: "로그인 후 이용해 주세요",
+                icon: "info"
+              });
+            }
+          },
+          error: function(xhr, status, error) {
+            //console.log("로그인 상태 확인 오류: " + error);
+            Swal.fire({
+              title: "오류",
+              text: "로그인 상태를 확인하는 중 오류가 발생했습니다.",
+              icon: "error"
+            });
+          }
+        });
+      }
+
+
+
+      loadImages();
+    });
+  </script>
+  <th:block th:include="common/footer"></th:block>
+</body>
+</html>

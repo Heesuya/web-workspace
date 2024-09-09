@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Insert title here</title>
+
+<script type="text/javascript"
+	src="http://code.jquery.com/jquery-3.7.1.js"></script>
+
+</head>
+
+<body>
+
+	<h1>학원 정보 조회</h1>
+
+	<hr>
+
+	<div>
+
+		<input type="text" name="khName" id="khName">
+
+		<button type="button" id="searchBtn">조회하기</button>
+
+	</div>
+	<div id="result"></div>
+
+	<script>
+		$("#searchBtn").on("click", function() {
+			const khName = $("#khName").val();
+			$.ajax({
+				url : "/kh/search",
+				type : "get",
+				data : {
+					name : khName
+				},
+				success : function(data) {
+					$("#result").empty();
+					if (data === "") {
+						const ul = $("<ul>");
+						const li = $("<li>");
+						li.text("정보가 없습니다.");
+						ul.append(li);
+						$("#result").append(ul);
+					} else {
+						const ul = $("<ul>");
+						const nameLi = $("<li>");
+						const addrLi = $("<li>");
+						const faxLi = $("<li>");
+						nameLi.text(data.khName);
+						addrLi.text(data.addr);
+						faxLi.text(data.fax);
+						ul.append(nameLi).append(addrLi).append(faxLi);
+						$("#result").append(ul);
+					}
+				},
+				error : function(data){
+					console.log("에러");
+				}
+
+			})
+
+		});
+	</script>
+
+</body>
+
+</html>

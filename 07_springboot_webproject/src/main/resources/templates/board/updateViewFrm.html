@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>게시물 수정</title>
+</head>
+<body>
+	<th:block th:include="common/header"></th:block>
+	<main class="updateBoardContent">
+		<section class="section board-view-warp">
+		<div class="page-title">게시글 수정</div>
+		<table class="tbl board-view">
+			<tr>
+				<th>제목</th>
+				<td th:text="${borad.text}"></td>
+			</tr>
+			<tr>
+				<th>첨부파일</th>
+				<td></td>
+			</tr>
+		</table>
+		</section>
+	</main>
+	<th:block th:include="common/footer"></th:block>
+</body>
+</html>
